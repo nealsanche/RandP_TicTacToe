@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -22,18 +21,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class TicTacHome extends Activity{
-    public static final String TURN_PREFERENCES = "TurnPrefs" ;
+public class TicTacHome extends Activity {
+    public static final String TURN_PREFERENCES = "TurnPrefs";
     public static final String PlayerKey = "playerKey";
     public static final String ChoicesKey = "choicesKey";
     SharedPreferences sharedpreferences;
     char[] positionArray;
-    String lastPlayerCharacter="X";
+    String lastPlayerCharacter = "X";
     LinearLayout parent_ll;
     String[] gridChoices;
     FrameLayout fl_grid;
     WinIndicatorLine winLine;
-    int choiceCount=0;
+    int choiceCount = 0;
     Button reset_button;
 
 
@@ -41,23 +40,24 @@ public class TicTacHome extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tic_tac_home);
-        fl_grid = (FrameLayout)findViewById(R.id.fl_grid);
-        parent_ll = (LinearLayout)findViewById(R.id.parent_ll);
-        reset_button = (Button)findViewById(R.id.reset_button);
-
+        fl_grid = (FrameLayout) findViewById(R.id.fl_grid);
+        parent_ll = (LinearLayout) findViewById(R.id.parent_ll);
+        reset_button = (Button) findViewById(R.id.reset_button);
 
         positionArray = new char[9];
-        if(gridChoices==null){
+        if (gridChoices == null) {
             gridChoices = new String[9];
         }
+
         getLastPlayed();//retrieve last input choices from sharedpreferences
-        if(savedInstanceState!=null) {//populate grid with current answers if resuming activity
+
+        if (savedInstanceState != null) {//populate grid with current answers if resuming activity
             gridChoices = savedInstanceState.getStringArray("grid_choices");
             lastPlayerCharacter = savedInstanceState.getString("last_player");
         }
+
         addGridBoxes();//add game grid
         setResetButtonListener();
-
     }
 
 
@@ -65,7 +65,6 @@ public class TicTacHome extends Activity{
     protected void onResume() {
         super.onResume();
         winChecker();
-
     }
 
 
@@ -79,76 +78,79 @@ public class TicTacHome extends Activity{
     }
 
 
-
-    private void addWinIndicator(int winScenarioNum){
-        winLine = getWinLine(fl_grid,winScenarioNum);
+    private void addWinIndicator(int winScenarioNum) {
+        winLine = getWinLine(fl_grid, winScenarioNum);
         fl_grid.addView(winLine);
-
     }
 
 
+    private void addGridBoxes() {
 
-    private void addGridBoxes(){
-        int boxNo=0;
-        if(gridChoices==null){
+        int boxNo = 0;
+
+        if (gridChoices == null) {
             gridChoices = new String[9];
         }
 
-        for(int rowNum=0;rowNum<3;rowNum++){  //add 3 layout rows to contain game boxes
+        for (int rowNum = 0; rowNum < 3; rowNum++) {  //add 3 layout rows to contain game boxes
+
             LinearLayout ll = new LinearLayout(this);
             ll.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,0,1f));
+                    LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
             ll.setOrientation(LinearLayout.HORIZONTAL);
             parent_ll.addView(ll);
-            for(int colNum=0;colNum<3;colNum++){  //add boxes to each row
+
+            for (int colNum = 0; colNum < 3; colNum++) {  //add boxes to each row
+
                 ImageButton gameBox = new ImageButton(this);
                 gameBox.setBackgroundResource(R.drawable.box_border);
-                gameBox.setLayoutParams(new LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.MATCH_PARENT,0.25f));
-                LinearLayout.LayoutParams layoutParams;
+                gameBox.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.25f));
+
                 ll.addView(gameBox);
                 gameBox.setTag(boxNo);
                 setBoxListener(gameBox);
-                if(gridChoices!=null && gridChoices[boxNo]!=null) {//populate previous choice if activity resumed
-                    setGameBox( gameBox, gridChoices[boxNo]);
-                }
-                boxNo++;
 
+                if (gridChoices != null && gridChoices[boxNo] != null) {//populate previous choice if activity resumed
+                    setGameBox(gameBox, gridChoices[boxNo]);
+                }
+
+                boxNo++;
             }
         }
     }
 
-    private void setGameBox(ImageButton gameBox, String choice){//set appropriate image and tags according to user choice
-        if(choice.equals("X")){
+    private void setGameBox(ImageButton gameBox, String choice) {//set appropriate image and tags according to user choice
+        if (choice.equals("X")) {
             gameBox.setImageResource(R.drawable.x);
-
-        }else if(choice.equals("O")){
+        } else if (choice.equals("O")) {
             gameBox.setImageResource(R.drawable.o);
-        }else{
+        } else {
             gameBox.setImageResource(R.drawable.box_border);
         }
-        gameBox.setScaleType(ImageView.ScaleType.FIT_XY);
-        gameBox.setTag(R.string.tag_player_indicator,choice);
-        //gridChoices[boxNo]=choice;
 
+        gameBox.setScaleType(ImageView.ScaleType.FIT_XY);
+        gameBox.setTag(R.string.tag_player_indicator, choice);
     }
 
-    private void setBoxListener( ImageButton boxButton){
-        boxButton.setOnClickListener(new View.OnClickListener(){
+    private void setBoxListener(ImageButton boxButton) {
+
+        boxButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 choiceCount++; //increment number of choices made in game
-                ImageButton ib = (ImageButton)view;
-                if(ib.getDrawable()==null) {  // place appropriate image in each box
+                ImageButton ib = (ImageButton) view;
+
+                if (ib.getDrawable() == null) {  // place appropriate image in each box
                     if (lastPlayerCharacter.equals("X")) {
-                        setGameBox( ib, "O");
+                        setGameBox(ib, "O");
                         lastPlayerCharacter = "O";
                     } else if (lastPlayerCharacter.equals("O")) {
-                        setGameBox( ib, "X");
+                        setGameBox(ib, "X");
                         lastPlayerCharacter = "X";
                     }
-                    gridChoices[(Integer)view.getTag()]=lastPlayerCharacter;//set the array variable according to the box chosen. Integer value of box is stored in tag upon creation
+
+                    gridChoices[(Integer) view.getTag()] = lastPlayerCharacter;//set the array variable according to the box chosen. Integer value of box is stored in tag upon creation
                     winChecker();
                 }
             }
@@ -156,17 +158,19 @@ public class TicTacHome extends Activity{
 
     }
 
-    private void winChecker(){
+    private void winChecker() {
         boolean won = checkAllWinOptions(lastPlayerCharacter);
-        if(won){
+
+        if (won) {
             showDoneDialog(true);
-        }else if(won==false && choiceCount>8){
+        } else if (won == false && choiceCount > 8) {
             showDoneDialog(false);
         }
     }
-    private WinIndicatorLine getWinLine(FrameLayout gridBox, int winLineScenario){
 
-        WinIndicatorLine winLine = new WinIndicatorLine(this,gridBox,winLineScenario);
+    private WinIndicatorLine getWinLine(FrameLayout gridBox, int winLineScenario) {
+
+        WinIndicatorLine winLine = new WinIndicatorLine(this, gridBox, winLineScenario);
 
         winLine.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -177,12 +181,14 @@ public class TicTacHome extends Activity{
 
 
     private boolean checkAllWinOptions(String xo) {
-        boolean won=false;
+
+        boolean won = false;
         int[] winningRow;
         int[][] rows = getWinnableRows();
-        for(int i=0; i<rows.length;i++){
-            int[] checkRow =  rows[i];
-            if(won =  checkWinOptionRow( xo,checkRow)){
+
+        for (int i = 0; i < rows.length; i++) {
+            int[] checkRow = rows[i];
+            if (won = checkWinOptionRow(xo, checkRow)) {
                 winningRow = checkRow;
                 addWinIndicator(i);
                 //gridChoices = new String[9];
@@ -193,26 +199,26 @@ public class TicTacHome extends Activity{
     }
 
 
-
-    private int[][] getWinnableRows(){
+    private int[][] getWinnableRows() {
         int[][] winRows = new int[][]{
-                {0,1,2},
-                {3,4,5},
-                {6,7,8},
-                {0,3,6},
-                {1,4,7},
-                {2,5,8},
-                {0,4,8},
-                {2,4,6}};
+                {0, 1, 2},
+                {3, 4, 5},
+                {6, 7, 8},
+                {0, 3, 6},
+                {1, 4, 7},
+                {2, 5, 8},
+                {0, 4, 8},
+                {2, 4, 6}};
         return winRows;
     }
-    private boolean checkWinOptionRow(String xo,int[] checkLine){
+
+    private boolean checkWinOptionRow(String xo, int[] checkLine) {
         boolean won = true;
 
-        for(int i=0;i<checkLine.length;i++){
+        for (int i = 0; i < checkLine.length; i++) {
             String choice = gridChoices[checkLine[i]];
-            if(choice==null || !(choice.equals(xo)))
-                won=false;
+            if (choice == null || !(choice.equals(xo)))
+                won = false;
         }
         return won;
     }
@@ -225,28 +231,25 @@ public class TicTacHome extends Activity{
     }
 
 
-    private void showDoneDialog(boolean won){
-
-
+    private void showDoneDialog(boolean won) {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.alert_layout);
         dialog.setCancelable(false);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        if(won){
-            dialog.setTitle(lastPlayerCharacter+" WINS!");
 
-
-        }else{
+        if (won) {
+            dialog.setTitle(lastPlayerCharacter + " WINS!");
+        } else {
             dialog.setTitle("NO WINNER THIS GAME.");
         }
         dialog.show();
+
         Button closeBtn = ((Button) dialog.findViewById(R.id.closeButton));
         closeBtn.setText("Done.");
-        Button newGameBtn=((Button) dialog.findViewById(R.id.ad_view_image));
+        Button newGameBtn = ((Button) dialog.findViewById(R.id.ad_view_image));
         newGameBtn.setText("Click to play again!");
 
-        closeBtn.setOnClickListener(new View.OnClickListener(){
-
+        closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 resetGame();
@@ -254,8 +257,7 @@ public class TicTacHome extends Activity{
                 TicTacHome.this.finish();
             }
         });
-        newGameBtn.setOnClickListener(new View.OnClickListener(){
-
+        newGameBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.cancel();
@@ -265,14 +267,14 @@ public class TicTacHome extends Activity{
         });
     }
 
-    private void resetGame(){
+    private void resetGame() {
         choiceCount = 0; //reset number of choices entered by players
         if (winLine != null) {
             fl_grid.removeView(winLine);
         }
         winLine = null;
         parent_ll.removeAllViews();
-        gridChoices=null;
+        gridChoices = null;
         addGridBoxes();
     }
 
@@ -284,47 +286,43 @@ public class TicTacHome extends Activity{
         setLastCharPlaced();
     }
 
-    private void deletePrefs(){
+    private void deletePrefs() {
         sharedpreferences = getSharedPreferences(TURN_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
-
         editor.remove(PlayerKey);
         editor.commit();
-
     }
-    private void setLastCharPlaced(){
+
+    private void setLastCharPlaced() {
         sharedpreferences = getSharedPreferences(TURN_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         Set<String> choiceSet = new HashSet<String>(Arrays.asList(gridChoices));
         editor.putStringSet(ChoicesKey, choiceSet);
-        for(int i=0;i<gridChoices.length;i++){
-            editor.putString(ChoicesKey+i, gridChoices[i]);
+        for (int i = 0; i < gridChoices.length; i++) {
+            editor.putString(ChoicesKey + i, gridChoices[i]);
         }
         editor.putString(PlayerKey, lastPlayerCharacter);
 
         editor.commit();
-
     }
-    private void getLastPlayed(){
+
+    private void getLastPlayed() {
         sharedpreferences = getSharedPreferences(TURN_PREFERENCES, Context.MODE_PRIVATE);
-        if (sharedpreferences.contains(ChoicesKey))
-        {
-            for(int i=0;i<gridChoices.length;i++) {
-                if(sharedpreferences.getString(ChoicesKey + i, "")!=""){
+        if (sharedpreferences.contains(ChoicesKey)) {
+            for (int i = 0; i < gridChoices.length; i++) {
+                if (!sharedpreferences.getString(ChoicesKey + i, "").equals("")) {
                     gridChoices[i] = sharedpreferences.getString(ChoicesKey + i, "");
                 }
 
             }
-
         }
-        if(sharedpreferences.contains(PlayerKey)){
-            lastPlayerCharacter = sharedpreferences.getString(PlayerKey,"X");
+        if (sharedpreferences.contains(PlayerKey)) {
+            lastPlayerCharacter = sharedpreferences.getString(PlayerKey, "X");
         }
     }
 
-    private void setResetButtonListener(){
-        reset_button.setOnClickListener(new View.OnClickListener(){
-
+    private void setResetButtonListener() {
+        reset_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deletePrefs();
